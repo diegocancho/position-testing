@@ -1,0 +1,160 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      tr:has(th) {
+        border-bottom: 2px solid #048f6a;
+      }
+      th {
+        color: #333;
+        font-weight: normal;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+    </style>
+    <script>
+      const experienceLevelMapping = {
+        associate: "Associate",
+        director: "Director",
+        entry_level: "Junior",
+        executive: "Executive",
+        internship: "Intern",
+        mid_senior_level: "Semi senior",
+        not_applicable: "-",
+      };
+
+      function tryParseModality(modalityString) {
+        const modality = modalityString.toLowerCase();
+        const hybridRegex = /[Hh][yií]br/;
+        const remoteRegex = /[Rr]emot/;
+
+        if (hybridRegex.test(modality)) {
+          return "Hybrid";
+        }
+        if (remoteRegex.test(modality)) {
+          return "Remote";
+        }
+        return "On-site";
+      }
+
+      function extractModality(jobTitle) {
+        if (!jobTitle.includes("-")) {
+          return [jobTitle];
+        }
+
+        const modality = jobTitle.split("-")[1].trim();
+        return [jobTitle.split("-")[0].trim(), modality];
+      }
+
+      function submitJobPosition() {
+        const jobPosition = document.getElementById("jobPosition");
+        const workFromHome = document.getElementById("workFromHome");
+        const experienceLevel = document.getElementById("experienceLevel");
+
+        const jobPositionValue = jobPosition.value;
+        const tableBody = document.getElementById("table-body");
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+
+        //----- Position------
+        const parsedTitle = extractModality(jobPositionValue);
+        td.textContent = parsedTitle[0];
+        tr.appendChild(td);
+        //----------------------------
+
+        //----- Experience level------
+        const experienceLevelValue = experienceLevel.value;
+        const tdExperienceLevel = document.createElement("td");
+        tdExperienceLevel.textContent = experienceLevelMapping[experienceLevelValue];
+        tr.appendChild(tdExperienceLevel);
+        //----------------------------
+
+        //-----------------Work arrangement----------------
+        if (parsedTitle.length > 1) {
+          const tdModality = document.createElement("td");
+          tdModality.textContent = tryParseModality(parsedTitle[1]);
+          tr.appendChild(tdModality);
+        } else {
+          // if workfromhome checkbox is checked, then it is remote
+          const tdModality = document.createElement("td");
+          tdModality.textContent = workFromHome.checked ? "Remote" : "On-site";
+          tr.appendChild(tdModality);
+        }
+        // ----------------------------------------------
+
+        //----- Location------
+        const location = document.getElementById("location");
+        const locationValue = location.value;
+        const tdLocation = document.createElement("td");
+        tdLocation.textContent = locationValue;
+        tr.appendChild(tdLocation);
+        //----------------------------
+
+        tableBody.appendChild(tr);
+      }
+    </script>
+
+    <h2>Add a job</h2>
+    <div>
+      <div>
+        <label for="jobPosition">Job position</label>
+        <input type="text" id="jobPosition" placeholder="Test a job position" />
+      </div>
+
+      <div>
+        <label for="workFromHome">Work from home</label>
+        <input type="checkbox" id="workFromHome" checked />
+      </div>
+      <div>
+        <label for="experienceLevel">Experience level</label>
+        <select name="experienceLevel" id="experienceLevel">
+          <option value="associate">Associate</option>
+          <option value="director">Director</option>
+          <option value="entry_level">Junior</option>
+          <option value="executive">Executive</option>
+          <option value="internship">Intern</option>
+          <option value="mid_senior_level">Semi senior</option>
+          <option value="not_applicable">Not applicable</option>
+        </select>
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input type="text" id="location" placeholder="Location" />
+      </div>
+      <div>
+        <input type="submit" value="Submit" onclick="submitJobPosition()" />
+      </div>
+    </div>
+
+    <hr />
+    <p>Content in webpage: </p>
+    <h2>Our current positions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Experience level</th>
+          <th>Work arrangement</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </body>
+</html>
